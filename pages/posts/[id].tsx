@@ -2,7 +2,7 @@ import { GetStaticProps, NextPage, GetStaticPaths } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
 import { ParsedUrlQuery } from 'querystring';
-import { post, posts, blocks } from '../../lib/notion';
+import { post, posts, blocks, getSlug, findPostBySlug } from '../../lib/notion';
 import styles from '../../styles/Home.module.css';
 
 interface IParams extends ParsedUrlQuery {
@@ -11,10 +11,13 @@ interface IParams extends ParsedUrlQuery {
 
 export const getStaticProps: GetStaticProps = async (ctx) => {
    let { id } = ctx.params as IParams; 
+   // Resolve a slug back to the Notion page ID (a page ID works as-is)
+   let match = await findPostBySlug(id);
+   let pageId = match ? match.id : id;
    // Get the dynamic id
-   let page_result = await post(id); 
+   let page_result = await post(pageId); 
    // Fetch the post
-   let { results } = await blocks(id); 
+   let { results } = await blocks(pageId); 
    // Get the children
    return {
      props: {
@@ -33,7 +36,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
        return {
          params: { 
            // set a params object with an id in it
-           id: post.id
+           id: getSlug(post)
          }
        }
      }),

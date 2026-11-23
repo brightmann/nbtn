@@ -25,9 +25,24 @@ async function blocks(id: string) {
     return myBlocks;
 }
 
+// Slug for a database row: the manual "Slug" text column, falling back
+// to the Notion page ID when the column is missing or empty.
+function getSlug(page: any): string {
+    const slug = page.properties?.Slug?.rich_text?.[0]?.plain_text;
+    return slug || page.id;
+}
+
+// Find the database row whose slug (or page ID) matches, or null.
+async function findPostBySlug(slug: string) {
+    const { results } = await posts();
+    return results.find((page: any) => getSlug(page) === slug) || null;
+}
+
 
 export {
     posts,
     post,
-    blocks
+    blocks,
+    getSlug,
+    findPostBySlug
 }

@@ -2,7 +2,7 @@ import type { NextPage } from 'next'
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 import Link from 'next/link';
-import { posts } from '../lib/notion'
+import { posts, getSlug } from '../lib/notion'
 
 export async function getStaticProps() {
     // Get the posts
@@ -36,11 +36,11 @@ const Home: NextPage<Props> = (props) => {
                 props.posts.map((result,index) => {
                 return (
                     <div className={styles.cardHolder} key={index}>
-                    <Link href={`/posts/${result.id}`}>
+                    <Link href={`/posts/${getSlug(result)}`}>
                         <img src={result.cover.external.url}  width={300} height={200} />
                     </Link>
                     <div className={styles.cardContent}>
-                        <Link href={`/posts/${result.id}`}>
+                        <Link href={`/posts/${getSlug(result)}`}>
                         <a className={styles.cardTitle}>{
                         result.properties.Name.title[0].plain_text
                         }</a>
