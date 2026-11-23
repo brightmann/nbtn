@@ -50,23 +50,48 @@ interface Props {
    blocks: [any]
 }
 
+// Convert a YouTube watch/shorts URL to an embed URL, or null.
+function youtubeEmbedUrl(url: string): string | null {
+  const m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)([\w-]{11})/);
+  return m ? `https://www.youtube.com/embed/${m[1]}` : null;
+}
+
+// Plain text of any block, for types without a dedicated renderer.
+function blockText(block: any): string {
+  const data = block[block.type];
+  const arr = data?.rich_text || data?.text || [];
+  return arr.map((t: any) => t.plain_text || t.text?.content || '').join('');
+}
+
 const renderBlock = (block: any) => {
    switch (block.type) {
      case 'heading_1': 
      // For a heading
        return <h1>{ block['heading_1'].text[0].plain_text } </h1> 
-     case 'image': 
+     case 'image': {
      // For an image
-       return <img src={ block['image'].external.url } width = { 650} height = { 400} />
+       const imageUrl = block['image'].external?.url || block['image'].file?.url;
+       return imageUrl ? <img src={ imageUrl } width = { 650} height = { 400} /> : null;
+     }
+     case 'video':
+     case 'embed': {
+     // For a video or embed (e.g. a YouTube link)
+       const videoUrl = block[block.type].external?.url || block[block.type].file?.url || block[block.type].url;
+       const embedUrl = videoUrl ? youtubeEmbedUrl(videoUrl) : null;
+       if (embedUrl) return <iframe src={ embedUrl } width = { 650 } height = { 400 } frameBorder="0" allowFullScreen />;
+       return videoUrl ? <a href={ videoUrl }>{ videoUrl }</a> : null;
+     }
        case 'bulleted_list_item': 
        // For an unordered list
        return <ul><li>{ block['bulleted_list_item'].text[0].plain_text } </li></ul >
        case 'paragraph': 
        // For a paragraph
        return <p>{ block['paragraph'].text[0]?.text?.content } </p>
-     default: 
-     // For an extra type
-       return <p>Undefined type </p>
+     default: {
+     // Any other type: show its text if it has any, else nothing
+       const text = blockText(block);
+       return text ? <p>{ text }</p> : null;
+     }
    }
 }
     
