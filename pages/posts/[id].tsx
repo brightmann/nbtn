@@ -31,7 +31,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
    let { results } = await posts(); 
    // Get all posts
    return {
-     paths: results.map((post) => { 
+     paths: results.map((post: any) => { 
        // Go through every post
        return {
          params: { 

@@ -4,11 +4,18 @@ const client = new Client({
     auth: process.env.NOTION_KEY,
 });
 
-async function posts() {
-    const myPosts = await client.databases.query({
+async function posts(cursor?: string, acc: any[] = []): Promise<any> {
+    const myPosts: any = await client.databases.query({
         database_id: `${process.env.NOTION_DATABASE}`,
+        start_cursor: cursor,
+        page_size: 100,
     });
-    return myPosts;
+    const all = acc.concat(myPosts.results);
+    // Notion returns at most 100 rows per call — page through the rest.
+    if (myPosts.has_more && myPosts.next_cursor) {
+        return posts(myPosts.next_cursor, all);
+    }
+    return { results: all };
 }
 
 async function post(id: string) {
@@ -18,11 +25,18 @@ async function post(id: string) {
     return myPost;
 }
 
-async function blocks(id: string) {
-    const myBlocks = await client.blocks.children.list({
-        block_id: id
+async function blocks(id: string, cursor?: string, acc: any[] = []): Promise<any> {
+    const myBlocks: any = await client.blocks.children.list({
+        block_id: id,
+        start_cursor: cursor,
+        page_size: 100,
     });
-    return myBlocks;
+    const all = acc.concat(myBlocks.results);
+    // Notion returns at most 100 blocks per call — page through the rest.
+    if (myBlocks.has_more && myBlocks.next_cursor) {
+        return blocks(id, myBlocks.next_cursor, all);
+    }
+    return { results: all };
 }
 
 // Slug for a database row: the manual "Slug" text column, falling back
