@@ -1,11 +1,10 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
-import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import Link from 'next/link';
 import { posts } from '../lib/notion'
 
-export async function getServerSideProps() {
+export async function getStaticProps() {
     // Get the posts
     let { results } = await posts();
     // Return the result
@@ -38,7 +37,7 @@ const Home: NextPage<Props> = (props) => {
                 return (
                     <div className={styles.cardHolder} key={index}>
                     <Link href={`/posts/${result.id}`}>
-                        <Image src={result.cover.external.url}  width={300} height={200} />
+                        <img src={result.cover.external.url}  width={300} height={200} />
                     </Link>
                     <div className={styles.cardContent}>
                         <Link href={`/posts/${result.id}`}>

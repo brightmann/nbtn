@@ -1,5 +1,4 @@
 import { GetStaticProps, NextPage, GetStaticPaths } from 'next';
-import Image from 'next/image';
 import Head from 'next/head';
 import Link from 'next/link';
 import { ParsedUrlQuery } from 'querystring';
@@ -55,7 +54,7 @@ const renderBlock = (block: any) => {
        return <h1>{ block['heading_1'].text[0].plain_text } </h1> 
      case 'image': 
      // For an image
-       return <Image src={ block['image'].external.url } width = { 650} height = { 400} />
+       return <img src={ block['image'].external.url } width = { 650} height = { 400} />
        case 'bulleted_list_item': 
        // For an unordered list
        return <ul><li>{ block['bulleted_list_item'].text[0].plain_text } </li></ul >
