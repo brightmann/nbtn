@@ -1,27 +1,28 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
-import Link from 'next/link';
-import { posts, getSlug } from '../lib/notion'
+import PostList from '../components/PostList';
+import Pager from '../components/Pager';
+import { getSortedPosts, getTotalPages, getPagePosts } from '../lib/pagination'
 
 export async function getStaticProps() {
-    // Get the posts
-    let { results } = await posts();
-    // Return the result
+    // Get the posts, newest first; homepage is page 1
+    const sorted = await getSortedPosts();
+    const totalPages = getTotalPages(sorted);
     return {
         props: {
-            posts: results,
-            
+            posts: getPagePosts(sorted, 1),
+            totalPages,
         }
     }
 }
 
 interface Props {
-    posts: [any]
+    posts: [any],
+    totalPages: number
 }
 
 const Home: NextPage<Props> = (props) => {
-    console.log(props.posts)
     return (
         <div className={styles.container}>
         <Head>
@@ -32,22 +33,8 @@ const Home: NextPage<Props> = (props) => {
             <h1 className={styles.title}>
             Latest posts
             </h1>
-            {
-                props.posts.map((result,index) => {
-                const title = result.properties.Name.title[0]?.plain_text || '';
-                return (
-                    <div className={styles.cardHolder} key={index}>
-                    <div className={styles.cardContent}>
-                        <Link href={`/posts/${getSlug(result)}`}>
-                        <a className={styles.cardTitle}>{
-                        title
-                        }</a>
-                        </Link>
-                    </div>
-                    </div>
-                    )
-                })
-            }
+            <PostList posts={props.posts} />
+            <Pager currentPage={1} totalPages={props.totalPages} />
         </main>
 
         <footer className={styles.footer}>
