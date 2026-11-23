@@ -34,15 +34,19 @@ const Home: NextPage<Props> = (props) => {
             </h1>
             {
                 props.posts.map((result,index) => {
+                const coverUrl = result.cover?.external?.url || result.cover?.file?.url;
+                const title = result.properties.Name.title[0]?.plain_text || '';
                 return (
                     <div className={styles.cardHolder} key={index}>
+                    {coverUrl ? (
                     <Link href={`/posts/${getSlug(result)}`}>
-                        <img src={result.cover.external.url}  width={300} height={200} />
+                        <img src={coverUrl}  width={300} height={200} />
                     </Link>
+                    ) : null}
                     <div className={styles.cardContent}>
                         <Link href={`/posts/${getSlug(result)}`}>
                         <a className={styles.cardTitle}>{
-                        result.properties.Name.title[0].plain_text
+                        title
                         }</a>
                         </Link>
                     </div>

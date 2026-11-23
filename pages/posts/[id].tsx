@@ -71,11 +71,12 @@ const renderBlock = (block: any) => {
 }
     
 const Post:NextPage<Props> = ({id,post,blocks}) => {
+   const title = post.properties.Name.title[0]?.plain_text || '';
    return (
      <div className={styles.blogPageHolder}>
        <Head>
          <title>
-           {post.properties.Name.title[0].plain_text}
+           {title}
          </title>
        </Head>
        <div className={styles.blogPageNav}>
@@ -85,6 +86,7 @@ const Post:NextPage<Props> = ({id,post,blocks}) => {
            </Link>
          </nav>
        </div>
+       <h1>{title}</h1>
        {
          blocks.map((block,index) => {
            return (
