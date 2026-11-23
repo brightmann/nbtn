@@ -1,5 +1,6 @@
 import type { NextPage, GetStaticProps, GetStaticPaths } from 'next';
 import { useEffect } from 'react';
+import { useRouter } from 'next/router';
 import Head from 'next/head';
 import Link from 'next/link';
 import styles from '../../styles/Home.module.css';
@@ -49,19 +50,23 @@ interface Props {
 }
 
 const Page: NextPage<Props> = (props) => {
+    const router = useRouter();
     // Page 1 lives at / — send visitors there (static export cannot
     // return a redirect from getStaticProps, so redirect client-side).
+    // router.replace('/') and router.basePath are basePath-aware, so
+    // this lands on /nbtn/ on GitHub Pages and / on Workers.
     useEffect(() => {
         if (props.currentPage === 1) {
-            window.location.replace('/');
+            router.replace('/');
         }
-    }, [props.currentPage]);
+    }, [props.currentPage, router]);
     if (props.currentPage === 1) {
+        const home = router.basePath ? `${router.basePath}/` : '/';
         return (
             <div className={styles.container}>
                 <Head>
                     <title>Latest posts</title>
-                    <meta httpEquiv="refresh" content="0; url=/" />
+                    <meta httpEquiv="refresh" content={`0; url=${home}`} />
                 </Head>
                 <main className={styles.main}>
                     <p>Redirecting to <Link href="/"><a>Latest posts</a></Link>…</p>
